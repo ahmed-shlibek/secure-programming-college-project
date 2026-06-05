@@ -36,8 +36,8 @@ document.querySelectorAll('.toggle-password').forEach(btn => {
     const closed = this.querySelector('.eye-closed');
     const isHidden = input.type === 'password';
     input.type = isHidden ? 'text' : 'password';
-    if (open)   open.style.display   = isHidden ? 'none'  : '';
-    if (closed) closed.style.display = isHidden ? ''      : 'none';
+    if (open)   open.style.display   = isHidden ? 'none'   : 'inline';
+    if (closed) closed.style.display = isHidden ? 'inline' : 'none';
   });
 });
 
