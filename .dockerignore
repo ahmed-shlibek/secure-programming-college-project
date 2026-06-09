@@ -1,0 +1,19 @@
+# Secrets — supplied at runtime via Render environment variables
+.env
+
+# VCS / editor / OS
+.git
+.gitignore
+.idea
+.vscode
+*.swp
+.DS_Store
+Thumbs.db
+
+# Docs and logs (not needed in the image)
+*.log
+PROJECT_GUIDE.md
+
+# Dependencies (none committed, but ignore if present)
+vendor
+node_modules
