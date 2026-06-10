@@ -1,5 +1,9 @@
 <?php
 
+namespace App\Controllers;
+
+use App\Models\Contact;
+
 class ContactController
 {
     public function submit(): void

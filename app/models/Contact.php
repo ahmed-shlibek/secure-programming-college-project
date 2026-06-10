@@ -1,5 +1,7 @@
 <?php
 
+namespace App\Models;
+
 class Contact
 {
     public static function create(string $name, string $email, string $message, string $ip): int

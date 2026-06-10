@@ -1,0 +1,23 @@
+{
+    "name": "ahmed/secure-programming-college-project",
+    "description": "Secure programming college project — a small hand-rolled PHP MVC app.",
+    "type": "project",
+    "require": {
+        "php": ">=8.2",
+        "vlucas/phpdotenv": "^5.6"
+    },
+    "autoload": {
+        "psr-4": {
+            "App\\Models\\": "app/models/",
+            "App\\Controllers\\": "app/controllers/"
+        },
+        "files": [
+            "app/helpers/env.php",
+            "app/helpers/functions.php"
+        ]
+    },
+    "config": {
+        "optimize-autoloader": true,
+        "sort-packages": true
+    }
+}

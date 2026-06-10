@@ -1,7 +1,8 @@
 # syntax=docker/dockerfile:1
 
 # ── Secure Programming College Project ────────────────────────────────
-# Plain PHP 8 app (no Composer deps) served by Apache.
+# Plain PHP 8 MVC app served by Apache. Composer is used only to generate
+# the PSR-4 autoloader (App\Controllers, App\Models) — no runtime deps.
 # Document root is public/. Connects to MySQL via PDO.
 # Built to run on Render's Docker runtime, which injects a $PORT to bind.
 # ──────────────────────────────────────────────────────────────────────
@@ -11,6 +12,9 @@ FROM php:8.3-apache
 # Install the PDO MySQL driver the app needs (app/config/database.php)
 RUN docker-php-ext-install pdo_mysql \
     && a2enmod rewrite headers
+
+# Composer binary — used at build time to generate the autoloader
+COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
 # Use production-tuned php.ini (disables display_errors, etc.)
 RUN mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini"
@@ -23,6 +27,9 @@ RUN rm -f /etc/apache2/sites-enabled/000-default.conf \
 
 # Copy the application source
 COPY . /var/www/html
+
+# Generate the optimized PSR-4 autoloader from composer.json / composer.lock
+RUN composer install --no-dev --optimize-autoloader --no-interaction
 
 # Drop files Apache doesn't need to serve
 RUN rm -rf /var/www/html/docker /var/www/html/.git /var/www/html/.idea \

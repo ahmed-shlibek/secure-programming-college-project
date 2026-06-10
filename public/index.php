@@ -7,13 +7,17 @@ ini_set('session.cookie_samesite', 'Lax');
 ini_set('session.gc_maxlifetime', 7200);
 session_start();
 
-//    Bootstrap       
-require_once __DIR__ . '/../app/helpers/env.php';
+//    Bootstrap
+// Composer autoloader: registers PSR-4 (App\Controllers, App\Models) and
+// loads the helper files (env.php, functions.php) via the "files" autoload.
+require_once __DIR__ . '/../vendor/autoload.php';
+
 loadEnv(__DIR__ . '/../.env');
 
-require_once __DIR__ . '/../app/config/app.php';      // defines BASE_URL, constants
+// Config files have load-order side effects (database.php reads .env at load),
+// so they stay as explicit requires here rather than being autoloaded.
+require_once __DIR__ . '/../app/config/app.php';       // defines BASE_URL, constants
 require_once __DIR__ . '/../app/config/database.php';  // defines getDB()
-require_once __DIR__ . '/../app/helpers/functions.php'; // isLoggedIn, redirect, e, csrf…
 
 //    Cloudflare origin verification
 //    In production, every request must carry the X-Origin-Verify header set by
@@ -111,30 +115,16 @@ if (!in_array($controllerName . '@' . $actionName, $publicRoutes) && !isLoggedIn
     redirect('/login');
 }
 
-//    Load models (before controller)                                           
-$modelDir = __DIR__ . '/../app/models/';
-if (is_dir($modelDir)) {
-    foreach (glob($modelDir . '*.php') as $modelFile) {
-        require_once $modelFile;
-    }
-}
+//    Dispatch
+// Models and controllers are autoloaded on first use via Composer PSR-4.
+$controllerClass = 'App\\Controllers\\' . $controllerName;
 
-//    Dispatch        
-$controllerFile = __DIR__ . '/../app/controllers/' . $controllerName . '.php';
-
-if (!file_exists($controllerFile)) {
+if (!class_exists($controllerClass)) {
     http_response_code(500);
     die('Controller not found: ' . e($controllerName));
 }
 
-require_once $controllerFile;
-
-if (!class_exists($controllerName)) {
-    http_response_code(500);
-    die('Controller class not found: ' . e($controllerName));
-}
-
-$controller = new $controllerName();
+$controller = new $controllerClass();
 
 if (!method_exists($controller, $actionName)) {
     http_response_code(500);

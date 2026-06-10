@@ -1,5 +1,9 @@
 <?php
 
+namespace App\Controllers;
+
+use App\Models\User;
+
 class PageController
 {
     public function dashboard(): void

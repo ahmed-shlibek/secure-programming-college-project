@@ -1,34 +1,24 @@
 <?php
 
+use Dotenv\Dotenv;
+
+/**
+ * Load a .env file into the environment using vlucas/phpdotenv.
+ *
+ * Immutable mode: existing real environment variables (e.g. the DB_* vars
+ * Render injects in production) are never overwritten by the file. In
+ * production there is no .env in the image (.dockerignore), so this safely
+ * no-ops and env() reads straight from the platform's variables.
+ */
 function loadEnv(string $path): void
 {
-    if (!file_exists($path)) {
-        return;
-    }
+    $dotenv = Dotenv::createImmutable(dirname($path), basename($path));
+    $dotenv->safeLoad(); // does not throw if the .env file is absent
 
-    $lines = file($path, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
-    foreach ($lines as $line) {
-        $line = trim($line);
-        // Skip comments and invalid lines
-        if (str_starts_with($line, '#') || !str_contains($line, '=')) {
-            continue;
-        }
-
-        [$name, $value] = explode('=', $line, 2);
-        $name = trim($name);
-        $value = trim($value);
-
-        // Remove quotes if present
-        if (preg_match('/^([\'"])(.*)\1$/', $value, $matches)) {
-            $value = $matches[2];
-        }
-
-        if (!array_key_exists($name, $_SERVER) && !array_key_exists($name, $_ENV)) {
-            putenv(sprintf('%s=%s', $name, $value));
-            $_ENV[$name] = $value;
-            $_SERVER[$name] = $value;
-        }
-    }
+    // Fail-closed: refuse to boot if a critical variable is missing or empty.
+    // Validates against the loaded file AND real environment variables, so it
+    // protects both local dev and the Render deployment.
+    $dotenv->required(['DB_HOST', 'DB_NAME', 'DB_USER'])->notEmpty();
 }
 
 /**
