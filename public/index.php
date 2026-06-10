@@ -15,6 +15,21 @@ require_once __DIR__ . '/../app/config/app.php';      // defines BASE_URL, const
 require_once __DIR__ . '/../app/config/database.php';  // defines getDB()
 require_once __DIR__ . '/../app/helpers/functions.php'; // isLoggedIn, redirect, e, csrf…
 
+//    Cloudflare origin verification
+//    In production, every request must carry the X-Origin-Verify header set by
+//    Cloudflare's Transform Rule. Blocks attackers who bypass Cloudflare and hit
+//    the origin server directly. Fail-closed: a missing secret in production is
+//    a hard 403, not a silent bypass. Skipped in local dev (APP_ENV=development).
+if (env('APP_ENV') === 'production') {
+    $originSecret   = env('ORIGIN_SECRET');
+    $providedSecret = $_SERVER['HTTP_X_ORIGIN_VERIFY'] ?? '';
+
+    if (empty($originSecret) || !is_string($providedSecret) || !hash_equals($originSecret, $providedSecret)) {
+        http_response_code(403);
+        exit('Forbidden');
+    }
+}
+
 //    Enforce session lifetime
 if (isLoggedIn() && isset($_SESSION['login_time'])) {
     if ((time() - $_SESSION['login_time']) > SESSION_LIFETIME) {
