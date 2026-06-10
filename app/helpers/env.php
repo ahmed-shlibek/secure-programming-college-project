@@ -12,7 +12,14 @@ use Dotenv\Dotenv;
  */
 function loadEnv(string $path): void
 {
-    $dotenv = Dotenv::createImmutable(dirname($path), basename($path));
+    // createUnsafeImmutable (not createImmutable) so phpdotenv's PutenvAdapter
+    // is registered, which reads getenv(). In production the DB_* vars are real
+    // container env vars injected by Render — and the production php.ini uses
+    // variables_order "GPCS" (no "E"), so $_ENV is empty and the values are only
+    // visible via getenv(). createImmutable only inspects $_ENV/$_SERVER, so its
+    // required() check would wrongly report them missing. "Unsafe" = uses
+    // putenv(), which is safe under Apache's prefork MPM.
+    $dotenv = Dotenv::createUnsafeImmutable(dirname($path), basename($path));
     $dotenv->safeLoad(); // does not throw if the .env file is absent
 
     // Fail-closed: refuse to boot if a critical variable is missing or empty.
