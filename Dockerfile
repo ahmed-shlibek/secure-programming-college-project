@@ -1,13 +1,19 @@
 # syntax=docker/dockerfile:1
 
 # ── Secure Programming College Project ────────────────────────────────
-# Plain PHP 8 MVC app served by Apache. Composer is used only to generate
-# the PSR-4 autoloader (App\Controllers, App\Models) — no runtime deps.
+# PHP 8 MVC app served by Apache. Composer provides PSR-4 autoloading
+# (App\Controllers, App\Models) and the one runtime dep, vlucas/phpdotenv.
 # Document root is public/. Connects to MySQL via PDO.
 # Built to run on Render's Docker runtime, which injects a $PORT to bind.
 # ──────────────────────────────────────────────────────────────────────
 
 FROM php:8.3-apache
+
+# System packages: git + unzip are required by Composer to fetch/extract
+# package archives (the base image ships with neither).
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends git unzip \
+    && rm -rf /var/lib/apt/lists/*
 
 # Install the PDO MySQL driver the app needs (app/config/database.php)
 RUN docker-php-ext-install pdo_mysql \
