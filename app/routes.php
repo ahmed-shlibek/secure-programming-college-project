@@ -9,9 +9,8 @@ return [
     ['POST', '/logout',    'AuthController',    'logout'],
 
     // Pages
-    ['GET',  '/dashboard', 'PageController',    'dashboard'],
     ['GET',  '/about',     'PageController',    'about'],
 
-    // Contact form (public)
+    // Contact form (authenticated)
     ['POST', '/contact',   'ContactController', 'submit'],
 ];

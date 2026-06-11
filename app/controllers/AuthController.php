@@ -10,7 +10,7 @@ class AuthController
     public function showLogin(): void
     {
         if (isLoggedIn()) {
-            redirect('/dashboard');
+            redirect('/about');
         }
         $pageTitle = 'Sign In';
         $error     = flash('error');
@@ -68,7 +68,7 @@ class AuthController
         $_SESSION['login_time'] = time();
         unset($_SESSION['csrf_token']); // force fresh CSRF token after login
 
-        redirect('/dashboard');
+        redirect('/about');
     }
 
     // Show register form
@@ -76,7 +76,7 @@ class AuthController
     public function showRegister(): void
     {
         if (isLoggedIn()) {
-            redirect('/dashboard');
+            redirect('/about');
         }
         $pageTitle = 'Create Account';
         $error     = flash('error');
@@ -130,7 +130,7 @@ class AuthController
     {
         // Accept CSRF check on logout to prevent forced-logout attacks
         if (!verifyCsrfToken($_POST['csrf_token'] ?? '')) {
-            redirect('/dashboard');
+            redirect('/about');
         }
 
         $_SESSION = [];

@@ -64,7 +64,7 @@ if ($requestUri !== '/' && str_ends_with($requestUri, '/')) {
 
 //    Root redirect   
 if ($requestUri === '/') {
-    redirect(isLoggedIn() ? '/dashboard' : '/login');
+    redirect(isLoggedIn() ? '/about' : '/login');
 }
 
 //    Load routes     
@@ -107,8 +107,6 @@ $publicRoutes = [
     'AuthController@login',
     'AuthController@showRegister',
     'AuthController@register',
-    'PageController@about',
-    'ContactController@submit',
 ];
 
 if (!in_array($controllerName . '@' . $actionName, $publicRoutes) && !isLoggedIn()) {
