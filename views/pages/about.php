@@ -89,6 +89,14 @@
       <p>Server-side validation runs on every input: email format, username characters, password complexity, and message length — before any data is trusted or stored.</p>
     </div>
 
+    <div class="sec-card">
+      <div class="sec-card-icon card-icon-warning">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+      </div>
+      <h3>Secure File Uploads</h3>
+      <p>PDF attachments are validated by <strong>magic bytes</strong> (not the client-supplied name or type), capped at 5&nbsp;MB, given a random server-side key, and stored in a <strong>private</strong> Cloudflare R2 bucket as <code>attachment</code>-disposition objects — so an upload can never be executed or served inline.</p>
+    </div>
+
   </div>
 </section>
 
@@ -116,7 +124,7 @@
     </div>
 
     <div class="contact-card">
-      <form method="POST" action="<?= url('contact') ?>" novalidate>
+      <form method="POST" action="<?= url('contact') ?>" enctype="multipart/form-data" novalidate>
         <?= csrfField() ?>
 
         <div class="grid-2">
@@ -155,6 +163,18 @@
             maxlength="2000"
             required
           ></textarea>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="attachment">Attachment <span style="font-weight:400;opacity:.7;">(optional)</span></label>
+          <input
+            type="file"
+            id="attachment"
+            name="attachment"
+            class="form-input"
+            accept="application/pdf,.pdf"
+          >
+          <small style="display:block;margin-top:.4rem;opacity:.7;">PDF only, max 5&nbsp;MB.</small>
         </div>
 
         <button type="submit" class="btn btn-primary btn-full">

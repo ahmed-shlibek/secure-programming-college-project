@@ -12,3 +12,8 @@ define('BASE_URL', $scriptDir === '/' ? '' : rtrim($scriptDir, '/'));
 define('MAX_LOGIN_ATTEMPTS', 5);
 define('LOGIN_LOCKOUT_TIME', 900); // 15 minutes in seconds
 define('SESSION_LIFETIME', 7200);  // 2 hours in seconds
+
+// Contact form
+define('CONTACT_UPLOAD_MAX_BYTES', 5 * 1024 * 1024); // 5 MB PDF cap
+define('CONTACT_RATE_WINDOW', 900);                  // 15 minutes in seconds
+define('CONTACT_MAX_SUBMISSIONS', 3);                // max submissions per IP per window

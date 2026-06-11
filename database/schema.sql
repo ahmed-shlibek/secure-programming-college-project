@@ -29,10 +29,18 @@ CREATE TABLE IF NOT EXISTS login_attempts (
 
 -- Contact messages table
 CREATE TABLE IF NOT EXISTS contacts (
-    id          INT UNSIGNED    PRIMARY KEY AUTO_INCREMENT,
-    name        VARCHAR(100)    NOT NULL,
-    email       VARCHAR(100)    NOT NULL,
-    message     TEXT            NOT NULL,
-    ip_address  VARCHAR(45)     NULL,
-    created_at  TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP
+    id              INT UNSIGNED    PRIMARY KEY AUTO_INCREMENT,
+    name            VARCHAR(100)    NOT NULL,
+    email           VARCHAR(100)    NOT NULL,
+    message         TEXT            NOT NULL,
+    ip_address      VARCHAR(45)     NULL,
+    -- Optional PDF attachment. The file lives in Cloudflare R2 (private bucket);
+    -- we only store a reference. attachment_key is a random, non-guessable object
+    -- key; attachment_name is the sanitized original filename, kept for display only.
+    attachment_key  VARCHAR(255)    NULL,
+    attachment_name VARCHAR(255)    NULL,
+    attachment_size INT UNSIGNED    NULL,
+    attachment_mime VARCHAR(100)    NULL,
+    created_at      TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    INDEX idx_ip_time (ip_address, created_at)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

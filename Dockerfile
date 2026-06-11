@@ -25,6 +25,11 @@ COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 # Use production-tuned php.ini (disables display_errors, etc.)
 RUN mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini"
 
+# Allow the 5 MB contact-form PDF uploads. Defaults are 2M (upload_max_filesize)
+# and 8M (post_max_size); post_max_size must exceed upload_max_filesize plus the
+# other form fields, so we set 6M / 8M.
+RUN printf "upload_max_filesize=6M\npost_max_size=8M\n" > "$PHP_INI_DIR/conf.d/uploads.ini"
+
 # Apache vhost: document root -> public/, listens on ${PORT}
 COPY docker/apache.conf /etc/apache2/sites-available/000-default.conf
 COPY docker/ports.conf /etc/apache2/ports.conf
