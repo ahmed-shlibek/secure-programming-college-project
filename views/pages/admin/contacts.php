@@ -43,7 +43,7 @@ require_once __DIR__ . '/../../layouts/header.php';
             <tr>
               <td class="nowrap"><?= e(date('M j, Y H:i', strtotime($c['created_at']))) ?></td>
               <td class="nowrap"><?= e($c['name']) ?></td>
-              <td class="nowrap"><a href="mailto:<?= e($c['email']) ?>"><?= e($c['email']) ?></a></td>
+              <td class="nowrap email"><a href="mailto:<?= e($c['email']) ?>"><?= e($c['email']) ?></a></td>
               <td class="msg"><?= nl2br(e($c['message'])) ?></td>
               <td class="nowrap"><?= e($c['ip_address'] ?? '—') ?></td>
               <td class="nowrap">

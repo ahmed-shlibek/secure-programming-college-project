@@ -643,6 +643,21 @@ input[type="file"].form-input::file-selector-button:hover {
   color:var(--text-muted);
 }
 
+/* On wider screens give the table fixed, proportional columns so it doesn't
+   stretch unevenly. Mobile (<=640px) keeps the natural-width scrolling layout. */
+@media (min-width:641px) {
+  .admin-table { table-layout:fixed; }
+  .admin-table th, .admin-table td { overflow-wrap:anywhere; }
+  .admin-table td.nowrap { white-space:normal; }   /* allow wrap so fixed columns never overflow */
+  .admin-table td.email a { word-break:break-all; }
+  .admin-table th:nth-child(1), .admin-table td:nth-child(1) { width:13%; } /* Date */
+  .admin-table th:nth-child(2), .admin-table td:nth-child(2) { width:14%; } /* Name */
+  .admin-table th:nth-child(3), .admin-table td:nth-child(3) { width:19%; } /* Email */
+  /* Message (4th) takes the remaining width */
+  .admin-table th:nth-child(5), .admin-table td:nth-child(5) { width:11%; } /* IP */
+  .admin-table th:nth-child(6), .admin-table td:nth-child(6) { width:14%; } /* Attachment */
+}
+
 /* Responsive */
 
 @media (max-width:640px) {
@@ -651,6 +666,22 @@ input[type="file"].form-input::file-selector-button:hover {
   .security-cards { grid-template-columns:1fr; }
   .grid-2 { grid-template-columns:1fr; }
   .navbar-brand .brand-name { display:none; }
+
+  /* Compact nav: collapse links/buttons to evenly-spaced, icon-only square
+     tap targets so nothing (esp. the logout button) overflows the bar. Labels
+     are hidden via font-size:0 while the fixed-size SVG icons remain visible. */
+  .navbar-inner { padding:0 1rem; }
+  .navbar-nav { gap:.5rem; }
+  .navbar-nav a,
+  .navbar-nav button {
+    width:40px; height:40px; padding:0; gap:0; font-size:0;
+    justify-content:center;
+  }
+  .navbar-nav a svg,
+  .navbar-nav button svg { width:20px; height:20px; }
+
+  /* User pill becomes just the avatar (username text hidden) */
+  .navbar-user { padding:0; background:none; gap:0; font-size:0; }
 }
 
 @media (max-width:400px) {
