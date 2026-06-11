@@ -65,6 +65,7 @@ class AuthController
 
         $_SESSION['user_id']    = $user['id'];
         $_SESSION['username']   = $user['username'];
+        $_SESSION['role']       = $user['role'] ?? 'user';
         $_SESSION['login_time'] = time();
         unset($_SESSION['csrf_token']); // force fresh CSRF token after login
 

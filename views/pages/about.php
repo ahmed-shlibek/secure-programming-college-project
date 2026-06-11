@@ -97,6 +97,14 @@
       <p>PDF attachments are validated by <strong>magic bytes</strong> (not the client-supplied name or type), capped at 5&nbsp;MB, given a random server-side key, and stored in a <strong>private</strong> Cloudflare R2 bucket as <code>attachment</code>-disposition objects — so an upload can never be executed or served inline.</p>
     </div>
 
+    <div class="sec-card">
+      <div class="sec-card-icon card-icon-primary">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 11l-3 3-2-2"/></svg>
+      </div>
+      <h3>Role-Based Access Control</h3>
+      <p>Every page requires an authenticated session, and admin-only areas (such as the contact-request viewer) are gated by a server-side <code>requireAdmin()</code> check on each action — never by hiding a link. Roles are assigned in the database; there is no in-app promotion path to exploit.</p>
+    </div>
+
   </div>
 </section>
 

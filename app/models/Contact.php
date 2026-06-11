@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use PDO;
+
 class Contact
 {
     public static function create(
@@ -42,5 +44,29 @@ class Contact
         );
         $stmt->execute([$ip, $windowSeconds]);
         return (int) $stmt->fetchColumn();
+    }
+
+    /**
+     * Most-recent contact submissions, newest first. For the admin view.
+     */
+    public static function all(int $limit = 100): array
+    {
+        $db   = getDB();
+        $stmt = $db->prepare(
+            'SELECT * FROM contacts ORDER BY created_at DESC, id DESC LIMIT :limit'
+        );
+        // LIMIT must be bound as an int — native prepares (emulation off) would
+        // otherwise quote it as a string and MySQL would reject the query.
+        $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetchAll();
+    }
+
+    public static function findById(int $id): ?array
+    {
+        $db   = getDB();
+        $stmt = $db->prepare('SELECT * FROM contacts WHERE id = ? LIMIT 1');
+        $stmt->execute([$id]);
+        return $stmt->fetch() ?: null;
     }
 }

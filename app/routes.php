@@ -13,4 +13,8 @@ return [
 
     // Contact form (authenticated)
     ['POST', '/contact',   'ContactController', 'submit'],
+
+    // Admin (admin role required — enforced in AdminController via requireAdmin)
+    ['GET',  '/admin/contacts',                  'AdminController', 'contacts'],
+    ['GET',  '/admin/contacts/{id}/attachment',  'AdminController', 'downloadAttachment'],
 ];

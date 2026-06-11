@@ -13,9 +13,11 @@ CREATE TABLE IF NOT EXISTS users (
     username      VARCHAR(50)     NOT NULL UNIQUE,
     email         VARCHAR(100)    NOT NULL UNIQUE,
     password      VARCHAR(255)    NOT NULL,   -- bcrypt hash
+    role          ENUM('user','admin') NOT NULL DEFAULT 'user',
     created_at    TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at    TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 
 -- Login attempts table (for rate limiting / brute-force protection)
 CREATE TABLE IF NOT EXISTS login_attempts (
@@ -34,9 +36,6 @@ CREATE TABLE IF NOT EXISTS contacts (
     email           VARCHAR(100)    NOT NULL,
     message         TEXT            NOT NULL,
     ip_address      VARCHAR(45)     NULL,
-    -- Optional PDF attachment. The file lives in Cloudflare R2 (private bucket);
-    -- we only store a reference. attachment_key is a random, non-guessable object
-    -- key; attachment_name is the sanitized original filename, kept for display only.
     attachment_key  VARCHAR(255)    NULL,
     attachment_name VARCHAR(255)    NULL,
     attachment_size INT UNSIGNED    NULL,

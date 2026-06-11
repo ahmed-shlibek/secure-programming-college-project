@@ -13,7 +13,23 @@ function currentUser(): ?array
     return [
         'id'       => $_SESSION['user_id'],
         'username' => $_SESSION['username'] ?? 'User',
+        'role'     => $_SESSION['role'] ?? 'user',
     ];
+}
+
+function isAdmin(): bool
+{
+    return isLoggedIn() && (($_SESSION['role'] ?? 'user') === 'admin');
+}
+
+// Guard for admin-only actions. Call at the very top of every admin controller
+// action — never rely on a hidden nav link for authorization.
+function requireAdmin(): void
+{
+    if (!isAdmin()) {
+        flash('error', 'Access denied — administrators only.');
+        redirect(isLoggedIn() ? '/about' : '/login');
+    }
 }
 
 function redirect(string $path): never
