@@ -22,6 +22,19 @@ function isAdmin(): bool
     return isLoggedIn() && (($_SESSION['role'] ?? 'user') === 'admin');
 }
 
+// The real client IP. Behind Cloudflare, REMOTE_ADDR is Cloudflare's edge IP, so
+// the genuine visitor IP arrives in CF-Connecting-IP. We only trust that header
+// because the origin-verification check rejects any request that didn't come
+// through Cloudflare; locally (no Cloudflare) we fall back to REMOTE_ADDR.
+function clientIp(): string
+{
+    $cf = $_SERVER['HTTP_CF_CONNECTING_IP'] ?? '';
+    if ($cf !== '' && filter_var($cf, FILTER_VALIDATE_IP)) {
+        return $cf;
+    }
+    return $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0';
+}
+
 // Guard for admin-only actions. Call at the very top of every admin controller
 // action — never rely on a hidden nav link for authorization.
 function requireAdmin(): void

@@ -178,14 +178,28 @@ class AuthController
 
     private function isRateLimited(string $identifier): bool
     {
-        $db   = getDB();
+        $db = getDB();
+
+        // Per-account: lock this identifier after MAX_LOGIN_ATTEMPTS failures.
         $stmt = $db->prepare(
             'SELECT COUNT(*) FROM login_attempts
              WHERE identifier = ?
                AND attempted_at > DATE_SUB(NOW(), INTERVAL ? SECOND)'
         );
         $stmt->execute([$identifier, LOGIN_LOCKOUT_TIME]);
-        return (int) $stmt->fetchColumn() >= MAX_LOGIN_ATTEMPTS;
+        if ((int) $stmt->fetchColumn() >= MAX_LOGIN_ATTEMPTS) {
+            return true;
+        }
+
+        // Per-IP: lock a source address making many failures across accounts
+        // (credential stuffing). Threshold is higher to tolerate shared/NAT IPs.
+        $stmt = $db->prepare(
+            'SELECT COUNT(*) FROM login_attempts
+             WHERE ip_address = ?
+               AND attempted_at > DATE_SUB(NOW(), INTERVAL ? SECOND)'
+        );
+        $stmt->execute([clientIp(), LOGIN_LOCKOUT_TIME]);
+        return (int) $stmt->fetchColumn() >= MAX_LOGIN_ATTEMPTS_PER_IP;
     }
 
     private function recordFailedAttempt(string $identifier): void
@@ -194,7 +208,7 @@ class AuthController
         $stmt = $db->prepare(
             'INSERT INTO login_attempts (identifier, ip_address) VALUES (?, ?)'
         );
-        $stmt->execute([$identifier, $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0']);
+        $stmt->execute([$identifier, clientIp()]);
     }
 
     private function clearFailedAttempts(string $identifier): void

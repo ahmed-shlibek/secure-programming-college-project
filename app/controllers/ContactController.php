@@ -15,7 +15,7 @@ class ContactController
             redirect('/about');
         }
 
-        $ip = $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0';
+        $ip = clientIp();
 
         // Rate limiting: cap submissions per IP per window (anti-spam / anti-abuse).
         if (Contact::recentCountForIp($ip, CONTACT_RATE_WINDOW) >= CONTACT_MAX_SUBMISSIONS) {
