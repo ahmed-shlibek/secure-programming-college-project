@@ -45,6 +45,20 @@ function url(string $path = ''): string
     return $base . '/' . ltrim($path, '/');
 }
 
+// Versioned asset URL. Appends the file's modification time as ?v=... so that
+// browsers and the Cloudflare CDN fetch a fresh copy whenever the file changes
+// (cache busting). Falls back to the plain URL if the file can't be found.
+function asset(string $path): string
+{
+    $path = ltrim($path, '/');
+    $full = __DIR__ . '/../../public/' . $path;
+    $url  = url($path);
+    if (is_file($full)) {
+        $url .= '?v=' . filemtime($full);
+    }
+    return $url;
+}
+
 function e(mixed $value): string
 {
     return htmlspecialchars((string) $value, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
