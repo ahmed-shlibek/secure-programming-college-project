@@ -518,6 +518,14 @@ input[type="file"].form-input::file-selector-button:hover {
 .sec-card h3 { font-size:1rem; font-weight:600; color:var(--text); margin-bottom:.5rem; }
 .sec-card p  { font-size:.875rem; color:var(--text-muted); line-height:1.7; }
 
+/* Optional per-card "Where:" footer (used by the network/edge cards) */
+.sec-card .where {
+  display:block; margin-top:1rem; padding-top:.75rem;
+  border-top:1px solid var(--border);
+  font-size:.75rem; color:var(--text-muted);
+}
+.sec-card .where b { color:var(--text); font-weight:600; }
+
 /* Contact section */
 
 .contact-section {

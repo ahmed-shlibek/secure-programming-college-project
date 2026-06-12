@@ -105,6 +105,60 @@
       <p>Every page requires an authenticated session, and admin-only areas (such as the contact-request viewer) are gated by a server-side <code>requireAdmin()</code> check on each action — never by hiding a link. Roles are assigned in the database; there is no in-app promotion path to exploit.</p>
     </div>
 
+    <div class="sec-card">
+      <div class="sec-card-icon card-icon-primary">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      </div>
+      <h3>End-to-End TLS (Full Strict)</h3>
+      <p>Cloudflare is set to <strong>Full (Strict)</strong> encryption. Traffic is encrypted on both legs — visitor to Cloudflare and Cloudflare to origin — and Cloudflare validates the origin's certificate, blocking man-in-the-middle interception.</p>
+      <span class="where"><b>Where:</b> Cloudflare · SSL/TLS</span>
+    </div>
+
+    <div class="sec-card">
+      <div class="sec-card-icon card-icon-success">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L4 5v6c0 5.5 3.8 9.5 8 11 4.2-1.5 8-5.5 8-11V5l-8-3z"/><path d="M9 12l2 2 4-4"/></svg>
+      </div>
+      <h3>Always HTTPS &amp; HSTS</h3>
+      <p>All HTTP requests are upgraded to HTTPS automatically. A <strong>HSTS</strong> policy (6-month max-age) instructs browsers to refuse any insecure connection, and the <code>.dev</code> TLD enforces HTTPS at the registry level.</p>
+      <span class="where"><b>Where:</b> Cloudflare · Edge Certificates</span>
+    </div>
+
+    <div class="sec-card">
+      <div class="sec-card-icon card-icon-secondary">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v6m0 6v10M4.2 4.2l4.3 4.3m7 7l4.3 4.3M1 12h6m6 0h10M4.2 19.8l4.3-4.3m7-7l4.3-4.3"/></svg>
+      </div>
+      <h3>Origin IP Concealment</h3>
+      <p>With Cloudflare's proxy enabled, every DNS lookup returns a Cloudflare anycast IP. The Render origin address is hidden from the public, so attackers cannot target the server directly with floods or scans.</p>
+      <span class="where"><b>Where:</b> Cloudflare · DNS proxy</span>
+    </div>
+
+    <div class="sec-card">
+      <div class="sec-card-icon card-icon-warning">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3h18v4H3z"/><path d="M3 10h18v4H3z"/><path d="M3 17h18v4H3z"/></svg>
+      </div>
+      <h3>Edge Rate Limiting</h3>
+      <p>A Cloudflare rate-limiting rule guards the <code>/login</code> and <code>/register</code> paths, blocking any IP that exceeds the threshold in a short window — stopping automated credential-stuffing and signup abuse <strong>before</strong> it reaches the origin.</p>
+      <span class="where"><b>Where:</b> Cloudflare · Rate limiting</span>
+    </div>
+
+    <div class="sec-card">
+      <div class="sec-card-icon card-icon-error">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L3 7v6c0 5 4 8 9 9 5-1 9-4 9-9V7l-9-5z"/><line x1="9" y1="12" x2="15" y2="12"/></svg>
+      </div>
+      <h3>DDoS Mitigation &amp; WAF</h3>
+      <p>Cloudflare absorbs volumetric (L3/L4) and application-layer (L7) DDoS attacks automatically. A Web Application Firewall with managed rules filters common exploit patterns such as SQL injection and XSS at the edge.</p>
+      <span class="where"><b>Where:</b> Cloudflare · Security</span>
+    </div>
+
+    <div class="sec-card">
+      <div class="sec-card-icon card-icon-primary">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/><circle cx="12" cy="16" r="1"/></svg>
+      </div>
+      <h3>Origin Verification Secret</h3>
+      <p>Cloudflare injects a secret <code>X-Origin-Verify</code> header into every proxied request. The application rejects with <code>403</code> any request that lacks it — using a constant-time <code>hash_equals()</code> check — so the origin cannot be bypassed even if its address leaks.</p>
+      <span class="where"><b>Where:</b> Cloudflare → Render origin</span>
+    </div>
+
   </div>
 </section>
 
