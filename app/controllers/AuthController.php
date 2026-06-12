@@ -28,39 +28,39 @@ class AuthController
             redirect('/login');
         }
 
-        $identifier = trim($_POST['identifier'] ?? '');
-        $password   = $_POST['password'] ?? '';
+        $email    = trim($_POST['email'] ?? '');
+        $password = $_POST['password'] ?? '';
 
-        if ($identifier === '' || $password === '') {
+        if ($email === '' || $password === '') {
             flash('error', 'All fields are required.');
             redirect('/login');
         }
 
-        // Brute-force protection
-        if ($this->isRateLimited($identifier)) {
+        // Brute-force protection (keyed by email)
+        if ($this->isRateLimited($email)) {
             flash('error', 'Too many failed attempts. Please wait 15 minutes before trying again.');
             redirect('/login');
         }
 
-        // Fetch user
-        $user = User::findByEmailOrUsername($identifier);
+        // Fetch user by email (the sole login identifier)
+        $user = User::findByEmail($email);
 
-        // Constant-time failure path (prevents username enumeration via timing)
+        // Constant-time failure path (prevents user enumeration via timing)
         if (!$user) {
             password_verify($password, '$2y$12$invalidhashpadding000000000000000000000000000000000000u');
-            $this->recordFailedAttempt($identifier);
+            $this->recordFailedAttempt($email);
             flash('error', 'Invalid credentials.');
             redirect('/login');
         }
 
         if (!password_verify($password, $user['password'])) {
-            $this->recordFailedAttempt($identifier);
+            $this->recordFailedAttempt($email);
             flash('error', 'Invalid credentials.');
             redirect('/login');
         }
 
         // Successful login — clear old attempts and regenerate session
-        $this->clearFailedAttempts($identifier);
+        $this->clearFailedAttempts($email);
         session_regenerate_id(true);
 
         $_SESSION['user_id']    = $user['id'];
@@ -109,11 +109,6 @@ class AuthController
 
         if (User::findByEmail($email)) {
             flash('error', 'An account with this email already exists.');
-            redirect('/register');
-        }
-
-        if (User::findByUsername($username)) {
-            flash('error', 'This username is already taken.');
             redirect('/register');
         }
 

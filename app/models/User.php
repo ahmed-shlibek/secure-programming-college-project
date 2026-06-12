@@ -4,29 +4,11 @@ namespace App\Models;
 
 class User
 {
-    public static function findByEmailOrUsername(string $identifier): ?array
-    {
-        $db   = getDB();
-        $stmt = $db->prepare(
-            'SELECT * FROM users WHERE email = :id OR username = :id2 LIMIT 1'
-        );
-        $stmt->execute([':id' => $identifier, ':id2' => $identifier]);
-        return $stmt->fetch() ?: null;
-    }
-
     public static function findByEmail(string $email): ?array
     {
         $db   = getDB();
         $stmt = $db->prepare('SELECT * FROM users WHERE email = ? LIMIT 1');
         $stmt->execute([$email]);
-        return $stmt->fetch() ?: null;
-    }
-
-    public static function findByUsername(string $username): ?array
-    {
-        $db   = getDB();
-        $stmt = $db->prepare('SELECT * FROM users WHERE username = ? LIMIT 1');
-        $stmt->execute([$username]);
         return $stmt->fetch() ?: null;
     }
 

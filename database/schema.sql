@@ -10,8 +10,8 @@ USE secure_programming_college_project;
 -- Users table
 CREATE TABLE IF NOT EXISTS users (
     id            INT UNSIGNED    PRIMARY KEY AUTO_INCREMENT,
-    username      VARCHAR(50)     NOT NULL UNIQUE,
-    email         VARCHAR(100)    NOT NULL UNIQUE,
+    username      VARCHAR(50)     NOT NULL,            -- display name; NOT unique
+    email         VARCHAR(100)    NOT NULL UNIQUE,     -- login identifier; unique
     password      VARCHAR(255)    NOT NULL,   -- bcrypt hash
     role          ENUM('user','admin') NOT NULL DEFAULT 'user',
     created_at    TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP,
