@@ -54,6 +54,31 @@ function getDB(): PDO
             // the global exception handler logs it and renders our 500 page.
             throw new RuntimeException('Database connection failed.', 0, $e);
         }
+
+        // TEMPORARY TLS diagnostic. Set DB_SSL_DEBUG=true (env) to dump the
+        // connection's encryption status on the first DB hit, then load any
+        // page in the browser. A non-empty Ssl_cipher means the channel is
+        // encrypted. REMOVE the env var (or set it false) when finished.
+        if (env('DB_SSL_DEBUG') === 'true') {
+            $cipher  = $pdo->query("SHOW STATUS LIKE 'Ssl_cipher'")->fetch();
+            $version = $pdo->query("SHOW STATUS LIKE 'Ssl_version'")->fetch();
+            $user    = $pdo->query("SELECT CURRENT_USER()")->fetchColumn();
+            $cipherVal = $cipher['Value'] ?? '';
+
+            if (!headers_sent()) {
+                header('Content-Type: text/plain; charset=utf-8');
+            }
+            echo "=== Database TLS check ===\n";
+            echo "Connected as: {$user}\n";
+            echo "DB_SSL_CA   : " . (DB_SSL_CA !== '' ? DB_SSL_CA : '(not set)') . "\n";
+            echo "Ssl_version : " . (($version['Value'] ?? '') ?: '(none)') . "\n";
+            echo "Ssl_cipher  : " . ($cipherVal ?: '(none)') . "\n\n";
+            echo $cipherVal !== ''
+                ? "RESULT: [PASS] Connection is ENCRYPTED (TLS).\n"
+                : "RESULT: [FAIL] Connection is NOT encrypted.\n";
+            echo "\nRemove the DB_SSL_DEBUG env var when you are done.\n";
+            exit;
+        }
     }
 
     return $pdo;
