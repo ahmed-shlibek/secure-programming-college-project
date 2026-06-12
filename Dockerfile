@@ -19,6 +19,11 @@ RUN apt-get update \
 RUN docker-php-ext-install pdo_mysql \
     && a2enmod rewrite headers
 
+# Don't advertise the Apache version in the Server header (ServerTokens Prod ->
+# just "Apache"; ServerSignature off on generated pages).
+RUN sed -ri 's/^ServerTokens .*/ServerTokens Prod/; s/^ServerSignature .*/ServerSignature Off/' \
+        /etc/apache2/conf-available/security.conf
+
 # Composer binary — used at build time to generate the autoloader
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
@@ -28,7 +33,7 @@ RUN mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini"
 # Allow the 5 MB contact-form PDF uploads. Defaults are 2M (upload_max_filesize)
 # and 8M (post_max_size); post_max_size must exceed upload_max_filesize plus the
 # other form fields, so we set 6M / 8M.
-RUN printf "upload_max_filesize=6M\npost_max_size=8M\n" > "$PHP_INI_DIR/conf.d/uploads.ini"
+RUN printf "upload_max_filesize=6M\npost_max_size=8M\nexpose_php=Off\n" > "$PHP_INI_DIR/conf.d/uploads.ini"
 
 # Apache vhost: document root -> public/, listens on ${PORT}
 COPY docker/apache.conf /etc/apache2/sites-available/000-default.conf

@@ -1,10 +1,18 @@
 <?php
 
-//    Session security (must happen before session_start)                        
+//    Session security (must happen before session_start)
 ini_set('session.cookie_httponly', 1);
 ini_set('session.use_strict_mode', 1);
 ini_set('session.cookie_samesite', 'Lax');
 ini_set('session.gc_maxlifetime', 7200);
+
+// Mark the session cookie Secure when the request arrived over HTTPS so it is
+// never transmitted over plain HTTP. In production Cloudflare/Render set
+// X-Forwarded-Proto; left off for local http dev so login still works there.
+$isHttps = (($_SERVER['HTTPS'] ?? '') !== '' && ($_SERVER['HTTPS'] ?? '') !== 'off')
+    || (($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '') === 'https');
+ini_set('session.cookie_secure', $isHttps ? '1' : '0');
+
 session_start();
 
 //    Bootstrap
@@ -77,6 +85,7 @@ if (isLoggedIn() && isset($_SESSION['login_time'])) {
 }
 
 //    Security headers
+header_remove('X-Powered-By');   // don't advertise the PHP version
 header('X-Frame-Options: DENY');
 header('X-Content-Type-Options: nosniff');
 header('X-XSS-Protection: 1; mode=block');
