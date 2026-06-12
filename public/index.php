@@ -19,6 +19,40 @@ loadEnv(__DIR__ . '/../.env');
 require_once __DIR__ . '/../app/config/app.php';       // defines BASE_URL, constants
 require_once __DIR__ . '/../app/config/database.php';  // defines getDB()
 
+//    Global error handling
+//    Never leak internals (SQL, stack traces, file paths) to the user. Log the
+//    real error and render our own generic 500 page. Full detail is shown only
+//    when APP_DEBUG is on AND we're not in production (local dev only).
+$appDebug = env('APP_DEBUG') === 'true' && env('APP_ENV') !== 'production';
+
+$renderServerError = static function () use ($appDebug): void {
+    if (!headers_sent()) {
+        http_response_code(500);
+    }
+    if (!$appDebug) {
+        require __DIR__ . '/../views/errors/500.php';
+    }
+};
+
+set_exception_handler(static function (\Throwable $e) use ($appDebug, $renderServerError): void {
+    error_log('Unhandled exception: ' . $e);
+    if ($appDebug) {
+        http_response_code(500);
+        echo '<pre>' . htmlspecialchars((string) $e, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') . '</pre>';
+        return;
+    }
+    $renderServerError();
+});
+
+// Catch fatal errors (which bypass the exception handler) too.
+register_shutdown_function(static function () use ($renderServerError): void {
+    $err = error_get_last();
+    if ($err !== null && in_array($err['type'], [E_ERROR, E_PARSE, E_CORE_ERROR, E_COMPILE_ERROR], true)) {
+        error_log("Fatal error: {$err['message']} in {$err['file']}:{$err['line']}");
+        $renderServerError();
+    }
+});
+
 //    Cloudflare origin verification
 //    In production, every request must carry the X-Origin-Verify header set by
 //    Cloudflare's Transform Rule. Blocks attackers who bypass Cloudflare and hit

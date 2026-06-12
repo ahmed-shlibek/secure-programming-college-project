@@ -11,6 +11,10 @@ define('DB_NAME', env('DB_NAME', 'stockvision'));
 define('DB_USER', env('DB_USER', 'root'));
 define('DB_PASS', env('DB_PASS', ''));
 define('DB_CHARSET', 'utf8mb4');
+// Path to the MySQL provider's CA certificate. When set, the connection is
+// encrypted with TLS and the server's certificate is verified (prevents
+// man-in-the-middle). Left empty for local dev (plain localhost connection).
+define('DB_SSL_CA', env('DB_SSL_CA', ''));
 
 /**
  * Get PDO database connection (singleton)
@@ -35,12 +39,20 @@ function getDB(): PDO
             PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES utf8mb4 COLLATE utf8mb4_unicode_ci",
         ];
 
+        // Enable TLS to the database when a CA certificate is configured. The
+        // CA both encrypts the link and verifies the server identity, so the
+        // app↔DB traffic can't be sniffed or man-in-the-middled in transit.
+        if (DB_SSL_CA !== '') {
+            $options[PDO::MYSQL_ATTR_SSL_CA]                 = DB_SSL_CA;
+            $options[PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT] = true;
+        }
+
         try {
             $pdo = new PDO($dsn, DB_USER, DB_PASS, $options);
         } catch (PDOException $e) {
-            // In production, log the error and show a generic message
-            error_log('Database connection failed: ' . $e->getMessage());
-            die('Database connection failed. Please check your configuration.');
+            // Don't leak connection details to the user. Re-throw a generic error;
+            // the global exception handler logs it and renders our 500 page.
+            throw new RuntimeException('Database connection failed.', 0, $e);
         }
     }
 

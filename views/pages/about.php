@@ -159,6 +159,33 @@
       <span class="where"><b>Where:</b> Cloudflare → Render origin</span>
     </div>
 
+    <div class="sec-card">
+      <div class="sec-card-icon card-icon-success">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/><path d="M9 12l2 2 4-4"/></svg>
+      </div>
+      <h3>Encrypted Database Connection</h3>
+      <p>The MySQL connection to Aiven is encrypted with <strong>TLS</strong>, and the server certificate is verified against Aiven's CA via <code>MYSQL_ATTR_SSL_VERIFY_SERVER_CERT</code>. Traffic between the origin and the database cannot be read or tampered with in transit.</p>
+      <span class="where"><b>Where:</b> Render → Aiven MySQL</span>
+    </div>
+
+    <div class="sec-card">
+      <div class="sec-card-icon card-icon-error">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L3 7v6c0 5 4 8 9 9 5-1 9-4 9-9V7l-9-5z"/><path d="M9 12l2 2 4-4"/></svg>
+      </div>
+      <h3>Database IP Allow-Listing</h3>
+      <p>The Aiven firewall rejects all inbound connections by default and accepts traffic <strong>only</strong> from Render's outbound IP ranges. Even if credentials leaked, the database could not be reached from anywhere else.</p>
+      <span class="where"><b>Where:</b> Aiven · Allowed IPs</span>
+    </div>
+
+    <div class="sec-card">
+      <div class="sec-card-icon card-icon-secondary">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/><path d="M17 11l2 2 4-4"/></svg>
+      </div>
+      <h3>Least-Privilege DB User</h3>
+      <p>The application connects with a dedicated user limited to <code>SELECT</code>, <code>INSERT</code>, <code>UPDATE</code>, and <code>DELETE</code> on a single schema — never the admin account. It cannot drop tables, alter structure, or grant privileges, containing the blast radius of any compromise.</p>
+      <span class="where"><b>Where:</b> Aiven MySQL · Grants</span>
+    </div>
+
   </div>
 </section>
 
