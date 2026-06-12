@@ -7,11 +7,10 @@ use Aws\S3\S3Client;
 /**
  * Thin wrapper around Cloudflare R2 (S3-compatible object storage).
  *
- * Security model: the bucket is PRIVATE. Files are uploaded server-side only,
- * after the controller has validated the bytes. Objects are stored with
- * Content-Disposition: attachment so they are always downloaded, never rendered
- * inline. Reading a file back requires a short-lived presigned URL minted here —
- * there is no public object URL.
+ * Security model: the bucket is PRIVATE. Files are uploaded server-side after
+ * the controller has validated the bytes, and read back server-side and streamed
+ * to the admin. The bucket is never exposed publicly and no URL to it is ever
+ * handed to a browser.
  */
 class R2Storage
 {
@@ -28,6 +27,11 @@ class R2Storage
             'version'                 => 'latest',
             'endpoint'                => "https://{$accountId}.r2.cloudflarestorage.com",
             'use_path_style_endpoint' => true,
+            // Recent aws-sdk-php enables request/response checksums by default,
+            // which S3-compatible providers like R2 don't fully support and which
+            // can cause AccessDenied / signature errors. Restore the old behaviour.
+            'request_checksum_calculation' => 'when_required',
+            'response_checksum_validation' => 'when_required',
             'credentials'             => [
                 'key'    => (string) env('R2_ACCESS_KEY_ID'),
                 'secret' => (string) env('R2_SECRET_ACCESS_KEY'),
@@ -65,18 +69,22 @@ class R2Storage
     }
 
     /**
-     * Mint a short-lived presigned GET URL for an object (for a future admin
-     * viewer). The bucket itself stays private.
+     * Fetch an object's bytes and content type. Uses the same live, signed
+     * request path as put() (so if uploads work, downloads work too).
+     * Throws Aws\Exception\AwsException on failure (caller must handle).
+     *
+     * @return array{body: string, contentType: string}
      */
-    public function presignedGetUrl(string $key, int $minutes = 15): string
+    public function get(string $key): array
     {
-        $command = $this->client->getCommand('GetObject', [
+        $result = $this->client->getObject([
             'Bucket' => $this->bucket,
             'Key'    => $key,
         ]);
 
-        $request = $this->client->createPresignedRequest($command, "+{$minutes} minutes");
-
-        return (string) $request->getUri();
+        return [
+            'body'        => (string) $result['Body'],
+            'contentType' => (string) ($result['ContentType'] ?? 'application/octet-stream'),
+        ];
     }
 }

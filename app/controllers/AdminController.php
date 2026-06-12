@@ -23,9 +23,9 @@ class AdminController
     }
 
     /**
-     * Mint a fresh, short-lived presigned R2 URL for one contact's PDF and
-     * redirect to it. Admin only; auth is re-checked on every click and the
-     * bucket stays private.
+     * Fetch one contact's PDF from the private R2 bucket and stream it to the
+     * admin as a download. Admin only; auth is re-checked on every click and
+     * the bucket is never exposed publicly.
      */
     public function downloadAttachment(string $id): void
     {
@@ -43,15 +43,23 @@ class AdminController
         }
 
         try {
-            $url = (new R2Storage())->presignedGetUrl($contact['attachment_key'], 5);
+            $object = (new R2Storage())->get($contact['attachment_key']);
         } catch (\Throwable $e) {
-            error_log('R2 presign failed: ' . $e->getMessage());
-            flash('error', 'Could not generate a download link. Please try again.');
+            error_log('R2 download failed: ' . $e->getMessage());
+            flash('error', 'Could not retrieve the file. Please try again.');
             redirect('/admin/contacts');
         }
 
-        // External URL — bypass the BASE_URL-prefixing redirect() helper.
-        header('Location: ' . $url);
+        // Use the sanitized original name for the download filename, falling back
+        // to the object key. Strip anything that could break the header.
+        $filename = $contact['attachment_name'] ?: $contact['attachment_key'];
+        $filename = preg_replace('/[^A-Za-z0-9._-]/', '_', (string) $filename);
+
+        header('Content-Type: ' . ($contact['attachment_mime'] ?: 'application/pdf'));
+        header('Content-Disposition: attachment; filename="' . $filename . '"');
+        header('Content-Length: ' . strlen($object['body']));
+        header('X-Content-Type-Options: nosniff');
+        echo $object['body'];
         exit;
     }
 }
