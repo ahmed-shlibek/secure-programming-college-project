@@ -23,7 +23,7 @@ require_once __DIR__ . '/../app/config/database.php';  // defines getDB()
 //    Never leak internals (SQL, stack traces, file paths) to the user. Log the
 //    real error and render our own generic 500 page. Full detail is shown only
 //    when APP_DEBUG is on AND we're not in production (local dev only).
-$appDebug = env('APP_DEBUG') === 'true' && env('APP_ENV') !== 'production';
+$appDebug = env('APP_DEBUG') === true && env('APP_ENV') !== 'production';
 
 $renderServerError = static function () use ($appDebug): void {
     if (!headers_sent()) {

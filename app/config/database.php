@@ -59,7 +59,7 @@ function getDB(): PDO
         // connection's encryption status on the first DB hit, then load any
         // page in the browser. A non-empty Ssl_cipher means the channel is
         // encrypted. REMOVE the env var (or set it false) when finished.
-        if (env('DB_SSL_DEBUG') === 'true') {
+        if (env('DB_SSL_DEBUG') === true) {
             $cipher  = $pdo->query("SHOW STATUS LIKE 'Ssl_cipher'")->fetch();
             $version = $pdo->query("SHOW STATUS LIKE 'Ssl_version'")->fetch();
             $user    = $pdo->query("SELECT CURRENT_USER()")->fetchColumn();
