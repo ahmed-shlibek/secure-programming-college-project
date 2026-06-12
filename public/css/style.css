@@ -500,6 +500,7 @@ input[type="file"].form-input::file-selector-button:hover {
   background:var(--white); border-radius:var(--radius-xl);
   padding:1.75rem; border:1px solid var(--border);
   box-shadow:var(--shadow-sm); transition:var(--transition);
+  display:flex; flex-direction:column;
 }
 
 .sec-card:hover {
@@ -516,11 +517,11 @@ input[type="file"].form-input::file-selector-button:hover {
 .sec-card-icon svg { width:24px; height:24px; }
 
 .sec-card h3 { font-size:1rem; font-weight:600; color:var(--text); margin-bottom:.5rem; }
-.sec-card p  { font-size:.875rem; color:var(--text-muted); line-height:1.7; }
+.sec-card p  { font-size:.875rem; color:var(--text-muted); line-height:1.7; margin-bottom:1.25rem; }
 
 /* Optional per-card "Where:" footer (used by the network/edge cards) */
 .sec-card .where {
-  display:block; margin-top:1rem; padding-top:.75rem;
+  display:block; margin-top:auto; padding-top:1rem;
   border-top:1px solid var(--border);
   font-size:.75rem; color:var(--text-muted);
 }

@@ -31,6 +31,7 @@
       </div>
       <h3>CSRF Protection</h3>
       <p>Cryptographically random 64-character tokens are bound to every session and validated on each POST request to prevent cross-site request forgery.</p>
+      <span class="where"><b>Where:</b> Application · CSRF tokens</span>
     </div>
 
     <div class="sec-card">
@@ -39,6 +40,7 @@
       </div>
       <h3>bcrypt Password Hashing</h3>
       <p>User passwords are hashed with <code>password_hash()</code> using the bcrypt algorithm at cost 12. Verified via <code>password_verify()</code> — no plain-text ever stored.</p>
+      <span class="where"><b>Where:</b> Application · AuthController</span>
     </div>
 
     <div class="sec-card">
@@ -47,6 +49,7 @@
       </div>
       <h3>SQL Injection Prevention</h3>
       <p>Every database interaction uses PDO prepared statements with bound parameters. No string concatenation or raw user input is ever passed to SQL.</p>
+      <span class="where"><b>Where:</b> Application · PDO models</span>
     </div>
 
     <div class="sec-card">
@@ -55,6 +58,7 @@
       </div>
       <h3>XSS Prevention</h3>
       <p>All output is escaped via <code>htmlspecialchars()</code> with the <code>ENT_QUOTES</code> flag. A strict Content Security Policy header blocks inline script injection.</p>
+      <span class="where"><b>Where:</b> Application · escaping + CSP</span>
     </div>
 
     <div class="sec-card">
@@ -63,6 +67,7 @@
       </div>
       <h3>Brute-Force Rate Limiting</h3>
       <p>Failed login attempts are tracked per identifier in the database. After 5 failures within 15 minutes the identifier is locked out automatically.</p>
+      <span class="where"><b>Where:</b> Application · login_attempts</span>
     </div>
 
     <div class="sec-card">
@@ -71,6 +76,7 @@
       </div>
       <h3>Session Hardening</h3>
       <p>Sessions use <code>HttpOnly</code>, <code>SameSite=Lax</code>, and strict mode cookies. The session ID is regenerated on login to prevent session fixation.</p>
+      <span class="where"><b>Where:</b> Application · session config</span>
     </div>
 
     <div class="sec-card">
@@ -79,6 +85,7 @@
       </div>
       <h3>Secure HTTP Headers</h3>
       <p><code>X-Frame-Options: DENY</code> prevents clickjacking. <code>X-Content-Type-Options: nosniff</code> blocks MIME sniffing. <code>Referrer-Policy</code> limits data leakage.</p>
+      <span class="where"><b>Where:</b> Application · index.php</span>
     </div>
 
     <div class="sec-card">
@@ -87,6 +94,7 @@
       </div>
       <h3>Input Validation</h3>
       <p>Server-side validation runs on every input: email format, username characters, password complexity, and message length — before any data is trusted or stored.</p>
+      <span class="where"><b>Where:</b> Application · server-side checks</span>
     </div>
 
     <div class="sec-card">
@@ -95,6 +103,7 @@
       </div>
       <h3>Secure File Uploads</h3>
       <p>PDF attachments are validated by <strong>magic bytes</strong> (not the client-supplied name or type), capped at 5&nbsp;MB, given a random server-side key, and stored in a <strong>private</strong> Cloudflare R2 bucket as <code>attachment</code>-disposition objects — so an upload can never be executed or served inline.</p>
+      <span class="where"><b>Where:</b> Application + Cloudflare R2</span>
     </div>
 
     <div class="sec-card">
@@ -103,6 +112,7 @@
       </div>
       <h3>Role-Based Access Control</h3>
       <p>Every page requires an authenticated session, and admin-only areas (such as the contact-request viewer) are gated by a server-side <code>requireAdmin()</code> check on each action — never by hiding a link. Roles are assigned in the database; there is no in-app promotion path to exploit.</p>
+      <span class="where"><b>Where:</b> Application · requireAdmin()</span>
     </div>
 
     <div class="sec-card">
