@@ -196,6 +196,15 @@
       <span class="where"><b>Where:</b> Aiven MySQL · Grants</span>
     </div>
 
+    <div class="sec-card">
+      <div class="sec-card-icon card-icon-secondary">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><polyline points="6 9 9 12 6 15"/><line x1="12" y1="15" x2="16" y2="15"/></svg>
+      </div>
+      <h3>No Shell Execution</h3>
+      <p>The application never invokes the operating-system shell or evaluates code — there are no calls to <code>exec</code>, <code>shell_exec</code>, <code>system</code>, <code>eval</code>, or similar. User input reaches only parameterized database queries and a typed storage API, so there is no path for command injection.</p>
+      <span class="where"><b>Where:</b> Application · no shell sinks</span>
+    </div>
+
   </div>
 </section>
 
